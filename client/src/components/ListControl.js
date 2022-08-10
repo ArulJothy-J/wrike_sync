@@ -6,7 +6,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 
-export default function CheckboxList() {
+export default function CheckboxList({ calenders = [] }) {
     const [checked, setChecked] = React.useState([0]);
 
     const handleToggle = (value) => () => {
@@ -24,15 +24,15 @@ export default function CheckboxList() {
 
     return (
         <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-            {[0, 1, 2, 3, 4].map((value) => {
-                const labelId = `checkbox-list-label-${value}`;
+            {calenders.map((value) => {
+                const labelId = `checkbox-list-label-${value.title}`;
 
                 return (
                     <ListItem
-                        key={value}
+                        key={value.title}
                         disablePadding
                     >
-                        <ListItemButton role={undefined} onClick={handleToggle(value)} dense>
+                        <ListItemButton role={undefined} onClick={handleToggle(value.id)} dense>
                             <ListItemIcon>
                                 <Checkbox
                                     edge="start"
@@ -42,7 +42,7 @@ export default function CheckboxList() {
                                     inputProps={{ 'aria-labelledby': labelId }}
                                 />
                             </ListItemIcon>
-                            <ListItemText id={labelId} primary={`Call ${value + 1}`} />
+                            <ListItemText id={labelId} primary={value.title} />
                         </ListItemButton>
                     </ListItem>
                 );

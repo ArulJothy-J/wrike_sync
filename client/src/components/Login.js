@@ -20,6 +20,7 @@ function Login() {
     console.log('Login Success: currentUser:', res.profileObj);
     console.log("res....", res);
     localStorage.setItem('name', res.profileObj.name);
+    localStorage.setItem('token', res.accessToken);
     refreshTokenSetup(res);
     navigate('/dashboard', { replace: true });
   };

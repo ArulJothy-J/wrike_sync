@@ -8,19 +8,45 @@ import ListControl from '../components/ListControl';
 import TabControl from '../components/TabControl';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import { getCalender, getCategories } from '../services';
 
 function Dashboard() {
     const [category, setCategory] = React.useState('');
+    const [calender, setCalender] = React.useState([]);
+    const [categories, setCategories] = React.useState([]);
 
     const handleChange = (event) => {
         setCategory(event.target.value);
     };
 
+    const getCalenderDetails = async () => {
+        try {
+            const { data } = await getCalender();
+            setCalender(data.task);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const getCategory = async () => {
+        try {
+            const { data } = await getCategories();
+            setCategories(data.data);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    React.useEffect(() => {
+        getCalenderDetails();
+        getCategory();
+    }, []);
+
     return <div>
-        <Paper        >
+        <Paper>
             <Grid container spacing={2}>
                 <Grid item>
-                    <ListControl />
+                    <ListControl calenders={calender} />
                 </Grid>
                 <Grid item xs={4} sm container spacing={2}>
                     <Grid item xs={2} spacing={2}>
@@ -33,9 +59,9 @@ function Dashboard() {
                                 label="Select Category"
                                 onChange={handleChange}
                             >
-                                <MenuItem value='category1'>Category 1</MenuItem>
-                                <MenuItem value='category2'>Category 2</MenuItem>
-                                <MenuItem value='category3'>Category 3</MenuItem>
+                                {categories.map((item) => (
+                                    <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Grid>
