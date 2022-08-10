@@ -7,7 +7,7 @@ var axios = require('axios');
 const fs = require('fs');
 
 
-module.exports.getCalendarEvents = async (req, ress) => {
+module.exports.getCalendarEvents = async (req, res) => {
 fs.readFile('credentials.json', (err, content) => {
     if (err) return console.log('Error loading client secret file:', err);
     authorize(JSON.parse(content), listEvents);
@@ -36,9 +36,9 @@ async function listEvents(auth) {
         // maxResults: 9,
         singleEvents: true,
         orderBy: 'startTime',
-    }, async (err, res) => {
-        if (err) return ress.status(400).send({err : 'The API returned an error: ' + err});
-        const events = res.data.items;
+    }, async (error, response) => {
+        if (error) return res.status(400).send({error : 'The API returned an error: ' + error});
+        const events = response.data.items;
         if (events.length) {
             console.log('Upcoming 10 events:');
             await asyncForEach(events, async (event, index) => {
@@ -67,9 +67,9 @@ async function listEvents(auth) {
                     }
                 }
             });            
-            return ress.status(200).send({task : _.uniqBy(wrikeTask, 'id')});
+            return res.status(200).send({task : _.uniqBy(wrikeTask, 'id')});
         } else {
-            return ress.status(400).send({err : 'No upcoming events found.'});
+            return res.status(400).send({err : 'No upcoming events found.'});
         }
     });
 }
@@ -116,7 +116,47 @@ async function getTaskId(permalinkValue){
 }
 
 module.exports.updatetimelog = async (req, res) => {
-    
+    let payload = req.body.timelogs ;
+    let totalCount = payload.length;
+    let count = 0;
+    let updatedLogs = []
+    let failedLogs = []
+    await asyncForEach(payload, async (timelog, index) => {
+        var {hours, trackedDate,comment ,categoryId, plainText} = timelog
+         var data = qs.stringify({
+            hours,
+            trackedDate,
+            comment,
+            categoryId,
+            plainText
+       });
+       var config = {
+        method: 'post',
+        url: `https://www.wrike.com/api/v4/tasks/${timelog.id}/timelogs`,
+        headers: { 
+          'Authorization': 'Bearer eyJ0dCI6InAiLCJhbGciOiJIUzI1NiIsInR2IjoiMSJ9.eyJkIjoie1wiYVwiOjIxODUxODcsXCJpXCI6ODMxNTQ0NixcImNcIjo0NjM0MjIzLFwidVwiOjUxMjMxNjEsXCJyXCI6XCJVU1wiLFwic1wiOltcIldcIixcIkZcIixcIklcIixcIlVcIixcIktcIixcIkNcIixcIkRcIixcIk1cIixcIkFcIixcIkxcIixcIlBcIl0sXCJ6XCI6W10sXCJ0XCI6MH0iLCJpYXQiOjE2NTg5OTk0MjB9.w7PkYqVrnmdXEN0HsGyFd93W1YmnElfKT8ztDMexKm0', 
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data : data
+      };
+     await axios(config)
+       .then(function (response) {
+         console.log(JSON.stringify(response.data));
+         count + 1
+         updatedLogs.push(timelog)
+        if(totalCount == count){
+            res.status('200').send({updatedLogs, failedLogs})
+        }
+       })
+       .catch(function (error) {
+         console.log(error);
+         count + 1
+         failedLogs.push(timelog)
+         if(totalCount == count){
+            res.status('200').send({updatedLogs, failedLogs})
+        }
+       });
+    })      
 };
      
 
