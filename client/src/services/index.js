@@ -1,16 +1,30 @@
 import axios from "axios";
 
-const getCalls = async () => {
-    try {
-        return await axios({
-            url: 'something',
-            method: 'get'
-        });
-    } catch (err) {
-        console.log(err);
-    }
+const getToken = () => {
+    return localStorage.getItem('token');
+};
+
+const getCalender = () => {
+    return axios({
+        url: 'http://localhost:3001/calendar',
+        method: 'get',
+        headers: {
+            authorization: `Bearer ${getToken()}`
+        }
+    });
+};
+
+const getCategories = () => {
+    return axios({
+        url: 'http://localhost:3001/categories',
+        method: 'get',
+        headers: {
+            authorization: `Bearer ${getToken()}`
+        }
+    });
 };
 
 export {
-    getCalls
+    getCalender,
+    getCategories
 };
