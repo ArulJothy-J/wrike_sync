@@ -1,30 +1,36 @@
 import axios from "axios";
 
+const endpoint = 'http://localhost:3001';
+
 const getToken = () => {
     return localStorage.getItem('token');
 };
 
-const getCalender = () => {
+const axiosRequest = (url, method, data) => {
     return axios({
-        url: 'http://localhost:3001/calendar',
-        method: 'get',
+        url: endpoint + url,
+        method: method,
         headers: {
             authorization: `Bearer ${getToken()}`
-        }
+        },
+        data
     });
 };
 
+const getCalender = (start) => {
+    return axiosRequest(`/calendar?start=${start}`, 'get');
+}
+
 const getCategories = () => {
-    return axios({
-        url: 'http://localhost:3001/categories',
-        method: 'get',
-        headers: {
-            authorization: `Bearer ${getToken()}`
-        }
-    });
+    return axiosRequest('/categories', 'get');
+};
+
+const updateTimelog = (data) => {
+    return axiosRequest('/updatetimelog', 'post', data);
 };
 
 export {
     getCalender,
-    getCategories
+    getCategories,
+    updateTimelog
 };
