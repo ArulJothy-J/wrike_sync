@@ -77,7 +77,9 @@ function Dashboard() {
                     hours,
                     id: item.id
                 }));
-                updateTimelog(result);
+                updateTimelog({
+                    timelogs: result
+                });
             } else {
                 console.log('Completed all required fields');
             }
